@@ -29,7 +29,9 @@ const resolvers = {
       return models.Url.findByPk(id);
     },
     async allUrls(root, args, { models }) {
-      return models.Url.findAll();
+      return models.Url.findAll({
+        order: [["createdAt", "DESC"]]
+      });
     },
     async urlBySlug(root, { slug }, { models }) {
       return models.Url.findOne({
