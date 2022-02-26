@@ -53,9 +53,9 @@ const resolvers = {
         let slugExists = false;
         do {
           slug = generateSlug();
-          slugExists = checkSlugExists(models, slug);
+          slugExists = await checkSlugExists(models, slug);
         } while (!slugExists);
-      } else if (checkSlugExists(models, slug)) {
+      } else if (await checkSlugExists(models, slug)) {
         throw new Error("Duplicate Slug");
       }
 
