@@ -2,6 +2,9 @@ const resolvers = {
   Query: {
     async user(root, { id }, { models }) {
       return models.User.findByPk(id);
+    },
+    async users(root, args, { models }) {
+      return models.User.findAll();
     }
   },
   Mutation: {
