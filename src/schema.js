@@ -11,6 +11,7 @@ const typeDefs = gql`
     url(id: Int!): Url
     urlBySlug(slug: String!): Url
     allUrls: [Url!]!
+    urlByUrl(url: String!): Url
   }
 
   type Mutation {

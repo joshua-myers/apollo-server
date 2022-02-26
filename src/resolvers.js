@@ -10,17 +10,17 @@ const generateSlug = () => {
     retrieveRandomKey(),
     retrieveRandomKey(),
     retrieveRandomKey()
-  ].join();
+  ].join("");
 };
 
-const slugExists = async (models, slug) => {
-  return !!(
-    await models.Url.findOne({
-      where: {
-        slug
-      }
-    })
-  ).length;
+const checkSlugExists = async (models, slug) => {
+  const existingSlug = await models.Url.findOne({
+    where: {
+      slug
+    }
+  });
+
+  return existingSlug;
 };
 
 const resolvers = {
@@ -33,26 +33,33 @@ const resolvers = {
     },
     async urlBySlug(root, { slug }, { models }) {
       return models.Url.findOne({
-        where: {
-          slug
-        }
+        where: { slug }
+      });
+    },
+    async urlByUrl(root, { url }, { models }) {
+      return models.Url.findOne({
+        where: { url }
       });
     }
   },
   Mutation: {
     async createUrl(root, { url, slug }, { models }) {
+      const existingUrl = await models.Url.findOne({ where: { url } });
+      if (existingUrl && (!slug || slug === existingUrl.slug)) {
+        return existingUrl;
+      }
       if (!slug) {
         // Generate a new unique slug
         let slugExists = false;
         do {
           slug = generateSlug();
-          slugExists = slugExists(models, slug);
+          slugExists = checkSlugExists(models, slug);
         } while (!slugExists);
-      } else if (slugExists(models, slug)) {
-        return { error: { code: 1, message: "Duplicate Slug" } };
+      } else if (checkSlugExists(models, slug)) {
+        throw new Error("Duplicate Slug");
       }
 
-      return models.Url.create(url, slug);
+      return models.Url.create({ url, slug });
     }
   }
 };
